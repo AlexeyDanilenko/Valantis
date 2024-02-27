@@ -1,33 +1,30 @@
 import React, { useState, useEffect } from 'react';
 
-function Filter({ fields, onFilterChange }) {
+function Filter({ fields, onFilterChange, clearFilter }) {
   const [selectedField, setSelectedField] = useState('');
   const [fieldValue, setFieldValue] = useState('');
 
-  // useEffect(() => {
-  //   async function fetchFields() {
-  //     const result = await fetchAPI('get_fields');
-  //     setFields(result);
-  //   }
-
-  //   fetchFields();
-  // }, []);
 
   const handleFieldChange = (field) => {
     setSelectedField(field);
-    console.log(field);
+    console.log('Выбран фильтр ', field);
 
     setFieldValue('');
   };
 
   const handleValueChange = (value) => {
     setFieldValue(value);
-    console.log(value);
+    console.log('Значение фильтра ', value);
   };
 
   const handleFilter = () => {
     onFilterChange(selectedField, fieldValue);
-    // console.log(selectedField, fieldValue);
+  };
+  const onClearFilter = () => {
+    setSelectedField('');
+    setFieldValue('');
+
+    clearFilter();
   };
 
   return (
@@ -35,7 +32,7 @@ function Filter({ fields, onFilterChange }) {
       <h2 className=' text-2xl mb-8'>Фильтры</h2>
       <div className=' flex flex-wrap items-center gap-4 mb-5'>
         <label htmlFor="field">Выберите поле для фильтрации:</label>
-        <select id="field" onChange={(e) => handleFieldChange(e.target.value)} value={selectedField}>
+        <select className="px-5 py-2 border border-solid border-slate-600 rounded" id="field" onChange={(e) => handleFieldChange(e.target.value)} value={selectedField}>
           <option value="" disabled>
             Выберите поле
           </option>
@@ -48,7 +45,7 @@ function Filter({ fields, onFilterChange }) {
       </div>
 
       {selectedField && (
-        <div className=' flex flex-wrap items-center gap-4 mb-5'>
+        <div className=' flex flex-wrap gap-4 mb-5'>
           <label htmlFor="value">Введите значение для фильтрации:</label>
           <input
             className="px-5 py-2 border border-solid border-slate-600 rounded"
@@ -58,7 +55,9 @@ function Filter({ fields, onFilterChange }) {
             onChange={(e) => handleValueChange(e.target.value)}
           />
 
-          <button onClick={handleFilter} className="bg-slate-500 px-5 py-2 rounded text-white">Применить фильтр</button>
+          <button onClick={handleFilter} className="bg-indigo-800 px-5 py-2 rounded text-white">Применить фильтр</button>
+
+          <button onClick={onClearFilter} className="bg-slate-500 px-5 py-2 rounded text-white">Очистить фильтры</button>
         </div>
       )}
     </div>
