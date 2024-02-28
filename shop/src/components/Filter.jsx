@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 function Filter({ fields, onFilterChange, clearFilter }) {
   const [selectedField, setSelectedField] = useState('');
   const [fieldValue, setFieldValue] = useState('');
 
-
   const handleFieldChange = (field) => {
     setSelectedField(field);
     console.log('Выбран фильтр ', field);
-
     setFieldValue('');
   };
 
@@ -20,10 +18,10 @@ function Filter({ fields, onFilterChange, clearFilter }) {
   const handleFilter = () => {
     onFilterChange(selectedField, fieldValue);
   };
+
   const onClearFilter = () => {
     setSelectedField('');
     setFieldValue('');
-
     clearFilter();
   };
 

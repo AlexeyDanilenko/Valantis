@@ -17,7 +17,7 @@ function Pagination({ currentPage, totalItems, itemsPerPage, onChange }) {
           <a
             href="#"
             onClick={() => handleClick(i)}
-            className={i === currentPage ? 'text-blue-900' : 'text-blue-400'}>
+            className={i === currentPage ? 'bg-blue-900 text-white p-2 text-center rounded-lg link-disabled' : 'text-blue-400'}>
             {i}
           </a>
         </li>
