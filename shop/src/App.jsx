@@ -30,99 +30,39 @@ async function fetchAPI(method, params) {
     return data.result;
   } else {
     const error = await response.text();
-    console.error(`Ошибка API: ${error}`);
+    console.error(`Ошибка API - Status: ${response.status}, Response: ${error}`);
     throw new Error(error);
   }
 }
 
-
 async function getProducts(offset = 0, selectedField = '', fieldValue = '') {
+  let params = {};
 
-  if (selectedField === '' || fieldValue === '') {
-    const allIds = await fetchAPI('get_ids', { "offset": 0 });
-    let uniqueIds = [...new Set(allIds)];
-    let limit = offset + 50;
-    const ids = uniqueIds.slice(offset, limit);
-    const items = await fetchAPI('get_items', { ids });
-
-    // Убираем дубликаты
-    const uniqueItems = items.reduce((acc, item) => {
-      if (!acc.find((i) => i.id === item.id)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
-
-    return {
-      products: uniqueItems,
-      total: uniqueIds.length,
-    };
+  if (selectedField && fieldValue) {
+    params[selectedField] = selectedField === 'price' ? parseInt(fieldValue) : fieldValue.toString();
+  } else {
+    params = { "offset": 0 };
   }
 
-  if (selectedField === 'price') {
-    const newValue = parseInt(fieldValue);
-    const filteredIds = await fetchAPI('filter', { "price": newValue });
-    let uniqueFilteredIds = [...new Set(filteredIds)];
-    let limit = offset + 50;
-    const ids = uniqueFilteredIds.slice(offset, limit);
-    const items = await fetchAPI('get_items', { ids });
+  const ids = await fetchAPI(selectedField ? 'filter' : 'get_ids', params);
 
-    // Убираем дубликаты
-    const uniqueItems = items.reduce((acc, item) => {
-      if (!acc.find((i) => i.id === item.id)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
+  const uniqueIds = [...new Set(ids)];
+  const limit = offset + 50;
+  const slicedIds = uniqueIds.slice(offset, limit);
 
-    return {
-      products: uniqueItems,
-      total: uniqueFilteredIds.length,
-    };
-  }
-  if (selectedField === 'brand') {
-    const newValue = fieldValue.toString();
-    const filteredIds = await fetchAPI('filter', { "brand": newValue });
-    let uniqueFilteredIds = [...new Set(filteredIds)];
-    let limit = offset + 50;
-    const ids = uniqueFilteredIds.slice(offset, limit);
-    const items = await fetchAPI('get_items', { ids });
+  const items = await fetchAPI('get_items', { ids: slicedIds });
 
-    // Убираем дубликаты
-    const uniqueItems = items.reduce((acc, item) => {
-      if (!acc.find((i) => i.id === item.id)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
+  const uniqueItems = items.reduce((acc, item) => {
+    if (!acc.find((i) => i.id === item.id)) {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
 
-    return {
-      products: uniqueItems,
-      total: uniqueFilteredIds.length,
-    };
-  }
-  if (selectedField === 'product') {
-    const newValue = fieldValue.toString();
-    const filteredIds = await fetchAPI('filter', { "product": newValue });
-    let uniqueFilteredIds = [...new Set(filteredIds)];
-    let limit = offset + 50;
-    const ids = uniqueFilteredIds.slice(offset, limit);
-    const items = await fetchAPI('get_items', { ids });
-
-    // Убираем дубликаты
-    const uniqueItems = items.reduce((acc, item) => {
-      if (!acc.find((i) => i.id === item.id)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
-
-    return {
-      products: uniqueItems,
-      total: uniqueFilteredIds.length,
-    };
-  }
-
+  return {
+    products: uniqueItems,
+    total: uniqueIds.length,
+  };
 }
 
 function App() {
